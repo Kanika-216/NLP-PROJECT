@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Language Enhancer</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .container { display: flex; width: 90%; max-width: 1200px; height: 90vh; gap: 20px; }
+        
+        /* Editor Area */
+        .editor-box { flex: 2; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        textarea { flex: 1; border: none; outline: none; resize: none; font-size: 16px; line-height: 1.6; color: #333; }
+        .analyze-btn { margin-top: 10px; padding: 10px 20px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .analyze-btn:hover { background-color: #27ae60; }
+
+        /* Sidebar for Issues */
+        .sidebar { flex: 1; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow-y: auto; }
+        h2 { color: #2c3e50; margin-top: 0; }
+        
+        .card { background: #f9f9f9; border-left: 5px solid #e74c3c; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .card.grammar { border-color: #e74c3c; } /* Red for grammar */
+        .card.style { border-color: #f1c40f; }   /* Yellow for style */
+        .suggestion { color: #2ecc71; font-weight: bold; cursor: pointer; }
+        .context { font-style: italic; color: #7f8c8d; font-size: 0.9em; margin-bottom: 5px; }
+
+        .stats { margin-bottom: 20px; padding: 10px; background: #e8f6f3; border-radius: 5px; color: #16a085; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="editor-box">
+        <h2>Write your text</h2>
+        <textarea id="inputText" placeholder="Type or paste your text here... (e.g., 'I is going to the store.')"></textarea>
+        <button class="analyze-btn" onclick="analyzeText()">Check Text</button>
+    </div>
+
+    <div class="sidebar">
+        <h2>Analysis Results</h2>
+        <div id="statsBox" class="stats" style="display:none;"></div>
+        <div id="resultsArea">
+            <p style="color: #7f8c8d;">Issues will appear here...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function analyzeText() {
+        const text = document.getElementById('inputText').value;
+        const resultsArea = document.getElementById('resultsArea');
+        const statsBox = document.getElementById('statsBox');
+
+        resultsArea.innerHTML = '<p>Analyzing...</p>';
+
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        });
+
+        const data = await response.json();
+        resultsArea.innerHTML = ''; // Clear loading
+
+        // Show Stats
+        statsBox.style.display = 'block';
+        statsBox.innerHTML = `
+            <strong>Sentiment:</strong> ${data.sentiment.polarity > 0 ? 'Positive' : 'Negative'} 
+            (${data.sentiment.polarity}) <br>
+            <strong>Subjectivity:</strong> ${data.sentiment.subjectivity * 100}%
+        `;
+
+        if (data.issues.length === 0) {
+            resultsArea.innerHTML = '<p style="color: #2ecc71;">No issues found! Great job.</p>';
+            return;
+        }
+
+        // Show Issues
+        data.issues.forEach(issue => {
+            const card = document.createElement('div');
+            card.className = `card ${issue.type}`;
+            
+            let suggestionHtml = '';
+            if (issue.suggestions && issue.suggestions.length > 0) {
+                suggestionHtml = `<br>Try: <span class="suggestion">${issue.suggestions.join(', ')}</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="context">"${issue.context}"</div>
+                <div><strong>${issue.message}</strong></div>
+                ${suggestionHtml}
+            `;
+            resultsArea.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>
