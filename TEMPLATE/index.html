@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Writing Enhancement Suite</title>
+    <style>
+        :root {
+            --primary: #5b4bc4; /* The specific purple from your screenshot */
+            --primary-light: #ecebff;
+            --bg: #f8f9fa;
+            --text-dark: #333;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* HEADER SECTION */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 850px;
+        }
+        .header h1 { color: var(--primary); margin: 0; font-size: 1.8rem; }
+        .header p { color: #666; margin-top: 5px; }
+
+        /* MAIN CARD */
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        /* TABS */
+        .mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f1f3f5;
+            padding: 5px;
+            border-radius: 50px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tab-btn {
+            border: none;
+            background: transparent;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(91, 75, 196, 0.4);
+        }
+
+        .description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        /* TEXT AREAS */
+        label { font-weight: bold; color: #444; display: block; margin-bottom: 8px; }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.3s;
+        }
+        textarea:focus { border-color: var(--primary); }
+        
+        #outputText { background-color: #fcfcfc; color: #333; }
+
+        /* CONTROL PANELS (Hidden by default) */
+        .control-panel {
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none; /* Hidden unless Academic Mode is on */
+        }
+        
+        .panel-title { font-weight: bold; margin-bottom: 10px; color: #444; font-size: 0.95rem; }
+        
+        .pill-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        
+        .pill-btn {
+            border: 1px solid #ddd;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #555;
+        }
+        
+        .pill-btn:hover { background: #eee; }
+        
+        .pill-btn.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* MAIN BUTTON */
+        .enhance-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #8fa1b3; /* Default gray like screenshot */
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .enhance-btn.ready { background-color: var(--primary); }
+
+        /* LOADING */
+        .loading { display: none; text-align: center; margin-top: 10px; color: var(--primary); font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>AI Writing Enhancement & Creator Suite</h1>
+    <p>Your All-in-One Final Project Solution</p>
+</div>
+
+<div class="container">
+
+    <div class="mode-tabs">
+        <button class="tab-btn active" onclick="switchMode('general', this)">Mode 1: General Writing ✍️</button>
+        <button class="tab-btn" onclick="switchMode('academic', this)">Mode 2: Academic Writing 🎓</button>
+        <button class="tab-btn" onclick="switchMode('creative', this)">Mode 3: Creative & Scripting ✨</button>
+    </div>
+
+    <p class="description" id="modeDesc">
+        Essential tools for students: Improve readability, summarize content, and check for grammar errors.
+    </p>
+
+    <label id="inputLabel">General Text Input</label>
+    <textarea id="inputText" placeholder="Paste your essay paragraph, report section, or text here..."></textarea>
+
+    <div id="academicControls" class="control-panel">
+        <div class="panel-title">Select Core Action:</div>
+        <div class="pill-container">
+            <button class="pill-btn selected" onclick="selectAction('check', this)">Grammar & Clarity Check</button>
+            <button class="pill-btn" onclick="selectAction('summarize', this)">Text Summarization</button>
+            <button class="pill-btn" onclick="selectAction('readability', this)">Readability Mode</button>
+        </div>
+
+        <div class="panel-title" style="margin-top: 15px;">Tone Changing:</div>
+        <div class="pill-container">
+            <button class="pill-btn selected" onclick="selectTone('neutral', this)">Neutral Tone</button>
+            <button class="pill-btn" onclick="selectTone('academic', this)">Academic Tone</button>
+            <button class="pill-btn" onclick="selectTone('formal', this)">Formal Tone</button>
+            <button class="pill-btn" onclick="selectTone('direct', this)">Direct Tone</button>
+        </div>
+    </div>
+
+    <button id="enhanceBtn" class="enhance-btn" onclick="processText()">Enhance Text</button>
+    <div id="loader" class="loading">Processing...</div>
+
+    <label style="margin-top: 25px;">Enhanced Output</label>
+    <textarea id="outputText" readonly placeholder="The improved content will appear here..."></textarea>
+
+</div>
+
+<script>
+    // State variables
+    let currentMode = 'general';
+    let currentAction = 'check';
+    let currentTone = 'neutral';
+
+    // 1. Handle Tab Switching
+    function switchMode(mode, btn) {
+        currentMode = mode;
+        
+        // Update Tab Styles
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Show/Hide Academic Controls
+        const controls = document.getElementById('academicControls');
+        const label = document.getElementById('inputLabel');
+        const btnMain = document.getElementById('enhanceBtn');
+
+        if (mode === 'academic') {
+            controls.style.display = 'block'; // Show extra buttons
+            label.innerText = "Academic Text Input";
+            btnMain.classList.add('ready'); // Turn purple
+        } else {
+            controls.style.display = 'none'; // Hide extra buttons
+            label.innerText = "Text Input";
+            btnMain.classList.add('ready');
+        }
+    }
+
+    // 2. Handle Sub-Button Selections (Action/Tone)
+    function selectAction(action, btn) {
+        currentAction = action;
+        // Reset siblings
+        btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+
+    function selectTone(tone, btn) {
+        currentTone = tone;
+        // Reset siblings
+        btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+
+    // 3. Send Data to Backend
+    async function processText() {
+        const text = document.getElementById('inputText').value;
+        const loader = document.getElementById('loader');
+        const outBox = document.getElementById('outputText');
+
+        if(!text) { alert("Please enter text first!"); return; }
+
+        loader.style.display = 'block';
+        outBox.value = '';
+
+        try {
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: text,
+                    mode: currentMode,
+                    action: currentAction,
+                    tone: currentTone
+                })
+            });
+
+            const data = await response.json();
+            outBox.value = data.corrected_text;
+
+        } catch (err) {
+            console.error(err);
+            alert("Error connecting to server.");
+        } finally {
+            loader.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

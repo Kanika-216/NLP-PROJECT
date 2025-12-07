@@ -1,6 +1,10 @@
 import spacy
 import language_tool_python
 from textblob import TextBlob
+import nltk
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -72,3 +76,29 @@ def process_text(text):
         "sentiment": sentiment,
         "corrected_text": tool.correct(text) # Auto-corrected version
     }
+
+def summarize_text(text, num_sentences=2):
+    """
+    Uses LSA (Latent Semantic Analysis) to summarize text.
+    Returns the top 'num_sentences' that best represent the content.
+    """
+    if not text.strip():
+        return ""
+        
+    try:
+        # 1. Parse the text
+        parser = PlaintextParser.from_string(text, Tokenizer("english"))
+        
+        # 2. Initialize the Summarizer
+        summarizer = LsaSummarizer()
+        
+        # 3. Get the summary
+        summary_sentences = summarizer(parser.document, num_sentences)
+        
+        # 4. Join sentences back into a string
+        summary_text = " ".join([str(sentence) for sentence in summary_sentences])
+        return summary_text
+        
+    except Exception as e:
+        # Fallback if text is too short or something fails
+        return f"Could not summarize (Text might be too short). Error: {str(e)}"
